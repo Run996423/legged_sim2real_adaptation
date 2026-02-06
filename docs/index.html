@@ -1,102 +1,239 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-          content="The sim-to-real gap remains a critical barrier preventing learning-based policies from achieving high
-            performance in real-world tasks. To address this challenge, we propose a real-time adaptation framework for
-            legged robots. Our approach explicitly estimates dynamic parameters online using real-world data, with the
-            policy conditioned on these estimated parameters to achieve optimal performance in current scenarios.
-            Extensive experiments demonstrate that our method outperforms the baseline by 27% in velocity tracking,
-            84% in base orientation stability, and 39% in robustness on average. Moreover, the explicit estimates can
-            be directly utilized for parameter-dependent downstream tasks such as payload mass identification,
-            leash-guided quadruped control, and force-aware locomotion.">
+    <meta charset="UTF-8"/>
     <title>Real-Time Dynamic Parameter Estimation for Legged Robot Sim-to-Real Adaptation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <style>
+        :root {
+            --bg: #f9fafb;
+            --fg: #111827;
+            --muted: #4b5563;
+            --accent: #2563eb;
+            --accent-soft: #dbeafe;
+            --border: #e5e7eb;
+            --card-bg: #ffffff;
+        }
+
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #eff6ff, #f9fafb 55%);
+            color: var(--fg);
             line-height: 1.6;
-            color: #333;
-            background-color: #f5f5f5;
         }
 
-        .container {
-            max-width: 1200px;
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .page {
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 2.5rem 1.5rem 3rem;
         }
 
         header {
-            background-color: #24292e;
-            color: white;
-            padding: 20px 0;
-            margin-bottom: 30px;
+            text-align: center;
+            margin-bottom: 2.5rem;
         }
 
-        header h1 {
-            text-align: center;
+        h1 {
+            font-size: clamp(1.8rem, 2.6vw + 1rem, 2.4rem);
+            margin: 0 0 0.75rem;
+            letter-spacing: 0.02em;
+        }
+
+        .authors {
+            color: var(--muted);
+            font-size: 0.98rem;
+        }
+
+        .links-row {
+            display: inline-flex;
+            gap: 0.75rem;
+            margin-top: 1.25rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .pill-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--border);
+            background: rgba(255, 255, 255, 0.85);
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 0.02em;
+        }
+
+        .pill-link.primary {
+            border-color: var(--accent);
+            background: var(--accent-soft);
         }
 
         main {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            background: var(--card-bg);
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.06),
+            0 1px 0 rgba(255, 255, 255, 0.8) inset;
+            padding: 1.5rem 1.5rem 1.75rem;
         }
 
-        footer {
+        .video-wrapper {
+            margin-bottom: 1.75rem;
+        }
+
+        .video-frame {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 */
+            border-radius: 0.75rem;
+            overflow: hidden;
+            background: #020617;
+            border: 1px solid var(--border);
+        }
+
+        .video-frame iframe,
+        .video-frame video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        section {
+            margin-top: 1.25rem;
+        }
+
+        h2 {
+            font-size: 1.15rem;
+            margin: 0 0 0.5rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        p {
+            margin: 0.25rem 0 0.75rem;
+            font-size: 0.98rem;
+        }
+
+        .method-image {
+            margin-top: 0.75rem;
             text-align: center;
-            padding: 20px;
-            margin-top: 30px;
-            color: #666;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
+        .method-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+        }
+
+        .method-caption {
+            margin-top: 0.3rem;
+            font-size: 0.82rem;
+            color: var(--muted);
+        }
+
+        @media (min-width: 768px) {
+            main {
+                padding: 1.8rem 2rem 2rem;
             }
 
-            main {
-                padding: 20px;
+            .video-wrapper {
+                margin-bottom: 2rem;
             }
         }
     </style>
 </head>
 <body>
-<header>
-    <div class="container">
+<div class="page">
+    <header>
         <h1>Real-Time Dynamic Parameter Estimation for Legged Robot Sim-to-Real Adaptation</h1>
-    </div>
-</header>
+        <div class="authors">Anonymous Authors</div>
 
-<div class="container">
+        <div class="links-row">
+            <a
+                    class="pill-link primary"
+                    href="https://anonymous.4open.science/r/legged-sim2real-adaptation-20B4"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >
+                Code
+            </a>
+            <a
+                    class="pill-link"
+                    href="TODO: VIDEO PAGE URL"
+                    target="_blank"
+                    rel="noopener noreferrer"
+            >
+                Video
+            </a>
+        </div>
+    </header>
+
     <main>
-        <h2>Abstract</h2>
-        <p>The sim-to-real gap remains a critical barrier preventing learning-based policies from achieving high
-            performance in real-world tasks. To address this challenge, we propose a real-time adaptation framework for
-            legged robots. Our approach explicitly estimates dynamic parameters online using real-world data, with the
-            policy conditioned on these estimated parameters to achieve optimal performance in current scenarios.
-            Extensive experiments demonstrate that our method outperforms the baseline by 27% in velocity tracking,
-            84% in base orientation stability, and 39% in robustness on average. Moreover, the explicit estimates can
-            be directly utilized for parameter-dependent downstream tasks such as payload mass identification,
-            leash-guided quadruped control, and force-aware locomotion.</p>
+        <div class="video-wrapper">
+            <div class="video-frame">
+                <!-- TODO: 替换 src 为你的实际嵌入视频链接（如 YouTube iframe） -->
+                <iframe
+                        src="TODO: EMBED VIDEO SRC"
+                        title="TODO: VIDEO TITLE"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen
+                ></iframe>
+            </div>
+        </div>
+
+        <section id="abstract">
+            <h2>Abstract</h2>
+            <p>
+                The sim-to-real gap remains a critical barrier preventing learning-based policies from achieving high
+                performance in real-world tasks. To address this challenge, we propose a real-time adaptation framework
+                for legged robots. Our approach explicitly estimates dynamic parameters online using real-world data,
+                with the policy conditioned on these estimated parameters to achieve optimal performance in current
+                scenarios. Extensive experiments demonstrate that our method outperforms the baseline by 27% in velocity
+                tracking, 84% in base orientation stability, and 39% in robustness on average. Moreover, the explicit
+                estimates can be directly utilized for parameter-dependent downstream tasks such as payload mass
+                identification, leash-guided quadruped control, and force-aware locomotion.
+            </p>
+        </section>
+
+        <section id="method">
+            <h2>Method</h2>
+            <p>
+                TODO: METHOD DESCRIPTION TEXT
+            </p>
+
+            <div class="method-image">
+                <!-- TODO: 将 src 换成你的方法示意图路径，如 images/method.png -->
+                <img
+                        src="TODO: METHOD IMAGE SRC"
+                        alt="TODO: METHOD IMAGE ALT TEXT"
+                />
+                <div class="method-caption">
+                    TODO: METHOD IMAGE CAPTION
+                </div>
+            </div>
+        </section>
     </main>
-
-    <footer>
-        <p>&copy; 2026 Anonymous. Hosted on GitHub Pages.</p>
-    </footer>
 </div>
-
-<script>
-    // 你的 JavaScript 代码
-    console.log('GitHub Pages 已加载');
-</script>
 </body>
 </html>
