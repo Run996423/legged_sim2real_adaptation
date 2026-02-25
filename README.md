@@ -27,9 +27,15 @@ This codebase is built following the structure of [legged_gym](https://github.co
 - Ubuntu 22.04 LTS (recommended)
 - NVIDIA GPU with CUDA support
 - Python 3.8
-- IsaacGym installed: https://developer.nvidia.com/isaac-gym
 
-### Install IsaacGym
+### Environment Setup
+
+Create conda env:
+
+```bash
+conda create -n ls2ra python=3.8
+conda activate ls2ra
+```
 
 Download [IsaacGym](https://developer.nvidia.com/isaac-gym/download) and extract:
 
@@ -41,7 +47,27 @@ tar -xvzf isaac-gym-preview-4
 Install IsaacGym Python API:
 
 ```bash
-uv pip install -e isaacgym/python
+pip install -e isaacgym/python
+```
+
+Install legged_gym:
+
+```bash
+cd path/to/legged_sim2real_adaptation
+pip install -e .
+```
+
+Install rsl_rl:
+
+```bash
+cd path/to/legged_sim2real_adaptation/rsl_rl-2.3.3
+pip install -e .
+```
+
+Install tensorboard:
+
+```bash
+pip install tensorboard
 ```
 
 For libpython error:
@@ -52,11 +78,13 @@ For libpython error:
 conda info -e
 ```
 
-- Set LD_LIBRARY_PATH:
+- Then set LD_LIBRARY_PATH:
 
 ```bash
-export LD_LIBRARY_PATH=</path/to/conda/envs/your_env/lib>:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=</path/to/conda/envs/your_env>/lib:$LD_LIBRARY_PATH
 ```
+
+For `np.float` deprecated error in `isaacgym/python/isaacgym/torch_utils.py`, replace `np.float` by `float`.
 
 ## Train the policy from scratch
 

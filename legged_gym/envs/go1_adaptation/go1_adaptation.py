@@ -3,8 +3,8 @@ import torch
 import numpy as np
 
 from legged_gym.envs import LeggedRobot
-from legged_gym.envs.go1w_rl_wbc.wheeled_go1_utils import quat_to_rpy, quat_from_rpy, quat_to_rot_mat, BMxBV
-from legged_gym.envs.go1w_rl_wbc.wheeled_go1_kin import position_level_forward_kinematics, compute_q40
+from legged_gym.envs.go1_adaptation.wheeled_go1_utils import quat_to_rpy, quat_from_rpy, quat_to_rot_mat, BMxBV
+from legged_gym.envs.go1_adaptation.wheeled_go1_kin import position_level_forward_kinematics, compute_q40
 
 
 class Go1Adaptation(LeggedRobot):

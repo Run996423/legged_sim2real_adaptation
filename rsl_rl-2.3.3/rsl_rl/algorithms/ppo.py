@@ -10,7 +10,7 @@ import torch.nn as nn
 import torch.optim as optim
 from itertools import chain
 
-from rsl_rl.modules import ActorCritic, ActorCriticEncoder, ActorCriticHybrid
+from rsl_rl.modules import ActorCritic, ActorCriticEncoder
 from rsl_rl.modules.rnd import RandomNetworkDistillation
 from rsl_rl.storage import RolloutStorage
 from rsl_rl.utils import string_to_callable
@@ -278,36 +278,6 @@ class PPO:
                             - 0.5,
                             axis=-1,
                         )
-                        kl_mean = torch.mean(kl)
-                    elif isinstance(self.policy, ActorCriticHybrid):
-                        # 连续动作的KL散度
-                        continuous_mu_batch = mu_batch[:, :self.policy.num_continuous_actions]
-                        continuous_sigma_batch = sigma_batch[:, :self.policy.num_continuous_actions]
-                        old_continuous_mu_batch = old_mu_batch[:, :self.policy.num_continuous_actions]
-                        old_continuous_sigma_batch = old_sigma_batch[:, :self.policy.num_continuous_actions]
-
-                        kl_continuous = torch.sum(
-                            torch.log(continuous_sigma_batch / old_continuous_sigma_batch + 1.0e-5)
-                            + (torch.square(old_continuous_sigma_batch) + torch.square(
-                                old_continuous_mu_batch - continuous_mu_batch))
-                            / (2.0 * torch.square(continuous_sigma_batch))
-                            - 0.5,
-                            dim=-1,
-                        )
-
-                        # 离散动作的KL散度（伯努利分布）
-                        discrete_p_batch = mu_batch[:, self.policy.num_continuous_actions:]  # 当前概率
-                        old_discrete_p_batch = old_mu_batch[:, self.policy.num_continuous_actions:]  # 旧概率
-
-                        kl_discrete = torch.sum(
-                            discrete_p_batch * torch.log(discrete_p_batch / (old_discrete_p_batch + 1e-8) + 1e-8)
-                            + (1 - discrete_p_batch) * torch.log(
-                                (1 - discrete_p_batch) / (1 - old_discrete_p_batch + 1e-8) + 1e-8),
-                            dim=-1,
-                        )
-
-                        # 总KL散度
-                        kl = kl_continuous + kl_discrete
                         kl_mean = torch.mean(kl)
                     else:
                         raise ValueError('policy type not supported for kl-divergence computation')

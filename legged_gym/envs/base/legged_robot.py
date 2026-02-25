@@ -41,9 +41,7 @@ from isaacgym import gymtorch, gymapi, gymutil
 import torch
 from torch import Tensor
 from typing import Tuple, Dict
-from mss import mss
 from PIL import Image
-import cv2
 
 from legged_gym import LEGGED_GYM_ROOT_DIR
 from legged_gym.envs.base.base_task import BaseTask
@@ -123,10 +121,7 @@ class LeggedRobot(BaseTask):
         self.user_data1 = False
         self.is_tracking_env = False
         self.tracked_env_id = 0
-        self.is_recording = False
         self.sim_duration = 0.
-        self.next_record_time = None
-        self.recorder = Recorder(fps=50, frameSize=(1920, 1080))
 
     def step(self, actions):
         """ Apply actions, simulate, call self.post_physics_step()
@@ -174,25 +169,10 @@ class LeggedRobot(BaseTask):
                 if evt.action == 'go_over_env' and evt.value > 0:
                     self.tracked_env_id = (self.tracked_env_id + self.num_envs // 20) % self.num_envs
                     print(f'tracked_env_id = {self.tracked_env_id}')
-                if evt.action == 'record' and evt.value > 0:
-                    self.is_recording = not self.is_recording
                 if evt.action == 'user_data1' and evt.value > 0:
                     self.user_data1 = not self.user_data1
             if self.is_tracking_env:
                 self.look_at_env(env_id=self.tracked_env_id)
-            if self.is_recording:
-                if self.next_record_time is None:
-                    self.next_record_time = self.sim_duration
-                if self.sim_duration >= self.next_record_time:
-                    self.next_record_time += 1 / self.recorder.fps
-                    with mss() as sct:
-                        monitor = sct.monitors[1]  # 0是所有显示器，1是主显示器
-                        screenshot = sct.grab(monitor)
-                        img = Image.frombytes('RGB', screenshot.size, screenshot.rgb)
-                        img_array = np.array(img)
-                        self.recorder.update(img_array)
-            elif self.recorder.frame_count > 0:
-                self.recorder.save('./video.mp4')
 
 
     def post_physics_step(self):

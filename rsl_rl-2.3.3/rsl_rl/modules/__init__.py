@@ -7,26 +7,22 @@
 
 from .actor_critic import ActorCritic
 from .actor_critic_encoder import ActorCriticEncoder
-from .actor_critic_hybrid import ActorCriticHybrid
 from .actor_critic_recurrent import ActorCriticRecurrent
 from .normalizer import EmpiricalNormalization
 from .rnd import RandomNetworkDistillation
 from .student_teacher import StudentTeacher
 from .student_teacher_recurrent import StudentTeacherRecurrent
-from .actor_critic_ae import ActorCriticAE
 from .actor_critic_supervised_latent import ActorCriticSupervisedLatent
 from .actor_critic_vae import ActorCriticVAE
 
 __all__ = [
     "ActorCritic",
     "ActorCriticEncoder",
-    "ActorCriticHybrid",
     "ActorCriticRecurrent",
     "EmpiricalNormalization",
     "RandomNetworkDistillation",
     "StudentTeacher",
     "StudentTeacherRecurrent",
-    "ActorCriticAE",
     "ActorCriticSupervisedLatent",
     "ActorCriticVAE"
 ]
