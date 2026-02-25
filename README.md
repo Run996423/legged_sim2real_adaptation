@@ -70,6 +70,9 @@ Install tensorboard:
 pip install tensorboard
 ```
 
+For tensorboard reading error, use another env with higher version of Python,
+then install tensorboard and visualize training curves.
+
 For libpython error:
 
 - Check conda path:
