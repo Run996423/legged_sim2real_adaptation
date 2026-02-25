@@ -89,9 +89,18 @@ export LD_LIBRARY_PATH=</path/to/conda/envs/your_env>/lib:$LD_LIBRARY_PATH
 
 For `np.float` deprecated error in `isaacgym/python/isaacgym/torch_utils.py`, replace `np.float` by `float`.
 
-## Train the policy from scratch
+## Train our policy from scratch
 
 ```bash
 cd legged_gym
 python scripts/train.py --task=go1_adaptation
+```
+
+## Train other policies for comparison
+
+```bash
+cd legged_gym
+python scripts/train.py --task=go1_adaptation_dr
+python scripts/train.py --task=go1_adaptation_imvae
+python scripts/train.py --task=go1_adaptation_oracle
 ```
