@@ -122,11 +122,11 @@
         }
 
         h2 {
-            font-size: 1.15rem;
-            margin: 0 0 0.5rem;
+            font-size: 2.0rem; /* 原来是 1.15rem，现在调大 */
+            margin: 2rem 0 1.5rem; /* 原来是 0 0 0.5rem，现在增加上下边距 */
             letter-spacing: 0.08em;
-            text-transform: uppercase;
-            color: var(--muted);
+            text-align: center; /* 新增：居中对齐 */
+            font-weight: 600; /* 新增（可选）：加粗字体 */
         }
 
         p {
@@ -179,8 +179,8 @@
                 Code
             </a>
             <a
-                    class="pill-link"
-                    href="TODO: VIDEO PAGE URL"
+                    class="pill-link primary"
+                    href="https://www.youtube.com/playlist?list=PLG-5CzJKb16SnrZxh_hAvW1XI_GIh05Qk"
                     target="_blank"
                     rel="noopener noreferrer"
             >
@@ -190,21 +190,9 @@
     </header>
 
     <main>
-        <div class="video-wrapper">
-            <div class="video-frame">
-                <!-- TODO: 替换 src 为你的实际嵌入视频链接（如 YouTube iframe） -->
-                <iframe
-                        src="TODO: EMBED VIDEO SRC"
-                        title="TODO: VIDEO TITLE"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowfullscreen
-                ></iframe>
-            </div>
-        </div>
-
         <section id="abstract">
             <h2>Abstract</h2>
-            <p>
+            <p style="text-align: justify;">
                 The sim-to-real gap remains a critical barrier preventing learning-based policies from achieving high
                 performance in real-world tasks. To address this challenge, we propose a real-time adaptation framework
                 for legged robots. Our approach explicitly estimates dynamic parameters online using real-world data,
@@ -218,21 +206,104 @@
 
         <section id="method">
             <h2>Method</h2>
-            <p>
-                TODO: METHOD DESCRIPTION TEXT
+            <p style="text-align: justify;">
+                Our method exploits real-world data to estimate dynamic parameters accurately in real-time and
+                retrieves the parameter-conditioned policy from a parameter-augmented base policy, thereby take
+                instance-specific information into consideration. In this work, we extend the notion of dynamic
+                parameters beyond static physical quantities (e.g., inertial properties and actuator parameters) to
+                include slowly time-varying external forces. Because forces like payload gravity and human-applied
+                traction vary on timescales of seconds rather than exhibiting high-frequency stochastic behavior, they
+                can be effectively estimated online as dynamic parameters rather than treated as unmodeled disturbances.
+            </p>
+            <div class="method-image">
+                <img
+                        src="overview.png"
+                />
+            </div>
+            <p style="text-align: justify;">
+                Since robot dynamic parameters remain relatively stable over short timescales, policies should condition
+                on specific parameter values to maximize instance-specific rewards, rather than optimizing expected
+                reward over the distribution of parameters. Specifically, the online adaptation module processes
+                historical proprioceptive observations to produce estimates of dynamic parameters. To provide richer
+                input to the policy network (actor), the online adaptation module simultaneously estimates the robot's
+                base linear velocity and a latent variable. Estimation of dynamic parameters and linear velocities is
+                learned via supervised training with simulation ground truth, while the latent variable is used to
+                filter high-frequency environmental noise and enhance policy stability. The current proprioceptive
+                observation, together with the output of the online adaptation module, serves as inputs to the policy
+                network.
             </p>
 
-            <div class="method-image">
-                <!-- TODO: 将 src 换成你的方法示意图路径，如 images/method.png -->
-                <img
-                        src="TODO: METHOD IMAGE SRC"
-                        alt="TODO: METHOD IMAGE ALT TEXT"
-                />
-                <div class="method-caption">
-                    TODO: METHOD IMAGE CAPTION
+        </section>
+
+        <section id="force_est">
+            <h2>Performance in Force Estimation</h2>
+            <p style="text-align: justify;">
+                We compared the external forces estimated by the online adaptation module with ground-truth measurements
+                obtained from load cells and spring dynamometers in real-world experiments. The experimental data
+                demonstrate that the online adaptation module achieves highly accurate force estimation, with relative
+                errors below 10%.
+            </p>
+            <div class="video-wrapper">
+                <div class="video-frame">
+                    <iframe
+                            src="https://www.youtube.com/embed/RRUDQszhlYE"
+                            title="Payload Identification"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+            <div class="video-wrapper">
+                <div class="video-frame">
+                    <iframe
+                            src="https://www.youtube.com/embed/m4iBWMmh5UU"
+                            title="Lateral Force Identification"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                    ></iframe>
                 </div>
             </div>
         </section>
+
+        <section id="payload_loco">
+            <h2>Performance in Locomotion</h2>
+            <p style="text-align: justify;">
+                We compared our method against a baseline using only domain randomization without adaptation mechanisms
+                on payload locomotion tasks with an 8.5 kg payload (70% of the robot's weight). Our method outperforms
+                the baseline in base orientation stability, base height control, and collision avoidance.
+            </p>
+            <div class="video-wrapper">
+                <div class="video-frame">
+                    <iframe
+                            src="https://www.youtube.com/embed/yvWqQpbcAmU"
+                            title="Payload Locomotion"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+
+        <section id="leash_guide">
+            <h2>Application: Leash-Guided Control</h2>
+            <p style="text-align: justify;">
+                Our method explicitly estimates robot dynamic parameters in real-time, which not only improves
+                sim-to-real transfer but also enables parameter-dependent downstream tasks such as leash-guided control.
+                In the following video, we set the velocity command to comply with the direction of the pulling force,
+                exhibiting dog-walking-like behavior.
+            </p>
+            <div class="video-wrapper">
+                <div class="video-frame">
+                    <iframe
+                            src="https://www.youtube.com/embed/JiJ_Vb7B2xk"
+                            title="Leash-Guided Control"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowfullscreen
+                    ></iframe>
+                </div>
+            </div>
+        </section>
+
     </main>
 </div>
 </body>
